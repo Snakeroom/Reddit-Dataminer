@@ -1,5 +1,27 @@
 {
 	"dependencies": {
 		"puppeteer": "^1.19.0"
-	}
+	},
+	"name": "reddit-dataminer",
+	"description": "Dumps Reddit scripts.",
+	"version": "1.0.0",
+	"main": "./src/index.js",
+	"devDependencies": {},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Snektective/Reddit-Dataminer.git"
+	},
+	"keywords": [
+		"reddit",
+		"datamining"
+	],
+	"author": "haykam821",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/Snektective/Reddit-Dataminer/issues"
+	},
+	"homepage": "https://github.com/Snektective/Reddit-Dataminer#readme"
 }
