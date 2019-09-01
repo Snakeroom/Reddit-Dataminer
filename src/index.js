@@ -1,7 +1,7 @@
 const cli = require("caporal");
 
 const puppeteer = require("puppeteer");
-const baseURL = "https://new.reddit.com/";
+const baseURL = "https://new.reddit.com";
 const filter = /https:\/\/www\.redditstatic\.com\/desktop2x\/([^.]+)\.?(.*)\.js/;
 
 const beautify = require('js-beautify').js;
@@ -14,14 +14,9 @@ const path = require("path");
 
 const got = require("got");
 
-const places = [
-	null,
-	"rpan",
-];
-
 async function getScripts(browser, uri) {
 	const page = await browser.newPage();
-	await page.goto(uri ? baseURL + uri : baseURL);
+	await page.goto(baseURL + uri);
 
 	const scripts = [];
 
@@ -34,13 +29,14 @@ async function getScripts(browser, uri) {
 }
 
 async function run(args) {
+	log(args)
 	await fse.ensureDir(args.path);
 	log("ensured output path exists");
 
 	const browser = await puppeteer.launch();
 	log("launched browser");
 
-	const scripts = [...new Set((await Promise.all(places.map(place => {
+	const scripts = [...new Set((await Promise.all(args.places.map(place => {
 		return getScripts(browser, place);
 	}))).flat())];
 	log("got list of scripts to dump");
@@ -52,7 +48,10 @@ async function run(args) {
 		const beautified = beautify(response.body, {
 			indent_with_tabs: true,
 		});
-		fse.writeFile(path.resolve(args.path, "./" + match[1] + ".js"), beautified);
+
+		await fse.ensureFile(path.resolve(args.path, "./" + match[1] + ".js"));
+		await fse.writeFile(path.resolve(args.path, "./" + match[1] + ".js"), beautified);
+
 		log("dumped %s", match[1]);
 	}));
 	log("finished dumping all scripts");
@@ -72,6 +71,12 @@ cli
 	.command("start", "Starts the script dumper.")
 	.option(...debugOpt)
 	.option("--path [path]", "The output path.", cli.STRING, null, true)
+	.option("--places [places...]", "The URIs to get script sources from.", cli.ARRAY, [
+		"/",
+		"/rpan",
+		"/coins",
+		"/premium",
+	])
 	.action((arguments2, options) => {
 		const args = Object.assign(arguments2, options);
 		debug.enable(args.debug);
