@@ -14,6 +14,13 @@ const path = require("path");
 
 const got = require("got");
 
+const { version } = require("../package.json");
+
+const format = require("string-format");
+const transformersGlobal = {
+	VERSION: version,
+};
+
 async function getScripts(browser, uri) {
 	const page = await browser.newPage();
 	await page.goto(baseURL + uri);
@@ -41,18 +48,39 @@ async function run(args) {
 	}))).flat())];
 	log("got list of scripts to dump");
 
+	const transformersRun = {
+		...transformersGlobal,
+		DATE: new Date().toLocaleString("en-US")
+	};
+
 	await Promise.all(scripts.map(async script => {
 		const match = script.match(filter);
 
-		const response = await got(script);
-		const beautified = beautify(response.body, {
-			indent_with_tabs: true,
-		});
+		try {
+			const response = await got(script);
+			const beautified = beautify(response.body, {
+				indent_with_tabs: true,
+			});
 
-		await fse.ensureFile(path.resolve(args.path, "./" + match[1] + ".js"));
-		await fse.writeFile(path.resolve(args.path, "./" + match[1] + ".js"), beautified);
+			const transformersScript = {
+				...transformersRun,
+				CHAR_COUNT: beautified.length,
+				FILE_NAME: match[1],
+				LINE_COUNT: beautified.split("\n").length,
+				URL: script,
+			};
 
-		log("dumped %s", match[1]);
+			const header = args.banner.length > 0 ? args.banner.map(line => {
+				return "// " + format(line, transformersScript);
+			}).join("\n") + "\n" : "";
+
+			await fse.ensureFile(path.resolve(args.path, "./" + match[1] + ".js"));
+			await fse.writeFile(path.resolve(args.path, "./" + match[1] + ".js"), header + beautified);
+
+			log("dumped %s", match[1]);
+		} catch (error) {
+			log("failed to dump %s: %o", error)
+		}
 	}));
 	log("finished dumping all scripts");
 	
@@ -62,7 +90,6 @@ async function run(args) {
 	return scripts;
 }
 
-const { version } = require("../package.json");
 cli.version(version);
 
 const debugOpt = ["--debug [debug]", "Debuggers to enable.", cli.STRING, "reddit-dataminer:*"];
@@ -76,6 +103,10 @@ cli
 		"/rpan",
 		"/coins",
 		"/premium",
+	])
+	.option("--banner [banner]", "The banner comment supporting placeholders", cli.ARRAY, [
+		"{URL}",
+		"Retrieved at {DATE} by Reddit Dataminer v{VERSION}",
 	])
 	.action((arguments2, options) => {
 		const args = Object.assign(arguments2, options);
