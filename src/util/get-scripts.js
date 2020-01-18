@@ -1,6 +1,14 @@
 const baseURL = "https://new.reddit.com";
 const filter = require("./filter.js");
 
+const noLoadResources = [
+	"script",
+	"image",
+	"stylesheet",
+	"font",
+	"media",
+];
+
 /**
  * Gets a list of scripts to dump from a URI.
  * @param {Browser} browser The browser to fetch the page's scripts from.
@@ -11,6 +19,15 @@ const filter = require("./filter.js");
 async function getScripts(browser, uri, hashes) {
 	const page = await browser.newPage();
 	await page.goto(baseURL + uri);
+
+	await page.setRequestInterception(true);
+	page.on("request", request => {
+		if (noLoadResources.includes(request.resourceType())) {
+			request.abort();
+		} else {
+			request.continue();
+		}
+	});
 
 	const scripts = [];
 
