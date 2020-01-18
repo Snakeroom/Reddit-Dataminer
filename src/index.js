@@ -67,10 +67,11 @@ async function run(args) {
 
 	const transformersRun = {
 		...transformersGlobal,
-		DATE: new Date().toLocaleString("en-US")
+		DATE: new Date().toLocaleString("en-US"),
+		SCRIPT_TOTAL: scripts.length,
 	};
 
-	await Promise.all(scripts.map(async script => {
+	await Promise.all(scripts.map(async (script, index) => {
 		const match = script.match(filter);
 
 		try {
@@ -82,8 +83,11 @@ async function run(args) {
 			const transformersScript = {
 				...transformersRun,
 				CHAR_COUNT: beautified.length,
-				FILE_NAME: match[1],
+				FILE_NAME: match[1] + ".js",
+				FILE_NAME_HASHED: `${match[1]}.${match[2]}.js`,
+				HASH: match[2],
 				LINE_COUNT: beautified.split("\n").length,
+				SCRIPT_INDEX: index + 1,
 				URL: script,
 			};
 
