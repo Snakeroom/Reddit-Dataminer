@@ -12,9 +12,21 @@
 	"description": "Dumps Reddit scripts.",
 	"version": "1.0.0",
 	"main": "./src/index.js",
-	"devDependencies": {},
+	"devDependencies": {
+		"eslint": "^6.8.0",
+		"eslint-config-haykam": "^1.8.0",
+		"eslint-plugin-extra-rules": "0.0.0-development",
+		"eslint-plugin-html": "^6.0.0",
+		"eslint-plugin-json": "^1.4.0",
+		"eslint-plugin-markdown": "^1.0.1",
+		"eslint-plugin-unicorn": "^10.0.0"
+	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"lint": "eslint \"./**/*.js\" --ignore-path .gitignore"
+	},
+	"eslintConfig": {
+		"extends": "eslint-config-haykam"
 	},
 	"repository": {
 		"type": "git",
