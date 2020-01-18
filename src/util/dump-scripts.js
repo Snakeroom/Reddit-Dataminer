@@ -1,5 +1,5 @@
-const { log } = require("./util/log.js");
-const filter = require("./util/filter.js");
+const { log } = require("./log.js");
+const filter = require("./filter.js");
 
 const got = require("got");
 
