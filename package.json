@@ -28,18 +28,18 @@
 	"eslintConfig": {
 		"extends": "eslint-config-haykam"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Snektective/Reddit-Dataminer.git"
-	},
 	"keywords": [
 		"reddit",
 		"datamining"
 	],
 	"author": "haykam821",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/Snektective/Reddit-Dataminer/issues"
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Snakeroom/Reddit-Dataminer.git"
 	},
-	"homepage": "https://github.com/Snektective/Reddit-Dataminer#readme"
+	"bugs": {
+		"url": "https://github.com/Snakeroom/Reddit-Dataminer/issues"
+	},
+	"homepage": "https://github.com/Snakeroom/Reddit-Dataminer#readme"
 }
