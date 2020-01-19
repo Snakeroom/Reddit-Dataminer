@@ -53,7 +53,7 @@ function dumpScripts(scripts, transformersRun, args, hashes) {
 
 			log("dumped %s", match[1]);
 		} catch (error) {
-			log("failed to dump %s: %o", error);
+			log("failed to dump %s: %o", script, error);
 		}
 	}));
 }
