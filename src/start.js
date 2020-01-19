@@ -32,7 +32,9 @@ async function start(args) {
 		return {};
 	});
 
-	const browser = await puppeteer.launch();
+	const browser = await puppeteer.launch({
+		args: args.noSandbox ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
+	});
 	log("launched browser");
 
 	const scriptsSet = new Set();

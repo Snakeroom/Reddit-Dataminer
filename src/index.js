@@ -23,6 +23,7 @@ cli
 		"Retrieved at {DATE} by Reddit Dataminer v{VERSION}",
 	])
 	.option("--hashes [hashes]", "A path to hashes, to prevent archiving a file if its hash is the same.", cli.STRING)
+	.option("--no-sandbox", "Whether the Puppeteer sandbox should be enabled.", cli.BOOLEAN)
 	.action((arguments2, options) => {
 		const args = Object.assign(arguments2, options);
 		debug.enable(args.debug);
