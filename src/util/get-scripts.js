@@ -1,4 +1,6 @@
 const baseURL = "https://new.reddit.com";
+
+const { log } = require("./log.js");
 const filter = require("./filter.js");
 
 const noLoadResources = [
@@ -19,6 +21,8 @@ const noLoadResources = [
 async function getScripts(browser, uri, hashes) {
 	const page = await browser.newPage();
 	await page.goto(baseURL + uri);
+
+	log("looking for scripts at %s", uri);
 
 	await page.setRequestInterception(true);
 	page.on("request", request => {
