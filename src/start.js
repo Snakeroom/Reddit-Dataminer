@@ -35,9 +35,12 @@ async function start(args) {
 	const browser = await puppeteer.launch();
 	log("launched browser");
 
-	const scripts = [...new Set((await Promise.all(args.places.map(place => {
-		return getScripts(browser, place, hashes);
-	}))).flat())];
+	const scriptsSet = new Set();
+	for (const place of args.places) {
+		const placeScripts = await getScripts(browser, place, hashes);
+		scriptsSet.add(...placeScripts);
+	}
+	const scripts = [...scriptsSet];
 	log("got list of scripts to dump");
 
 	const transformersRun = {
