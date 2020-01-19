@@ -40,7 +40,9 @@ async function start(args) {
 	const scriptsSet = new Set();
 	for (const place of args.places) {
 		const placeScripts = await getScripts(browser, place, hashes);
-		scriptsSet.add(...placeScripts);
+		for (const placeScript of placeScripts) {
+			scriptsSet.add(placeScript);
+		}
 	}
 	const scripts = [...scriptsSet];
 	log("got list of scripts to dump");
