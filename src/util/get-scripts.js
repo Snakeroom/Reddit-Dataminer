@@ -2,6 +2,7 @@ const baseURL = "https://new.reddit.com";
 
 const { log } = require("./log.js");
 const filter = require("./filter.js");
+const userAgent = require("./user-agent.js");
 
 const noLoadResources = [
 	"script",
@@ -20,6 +21,7 @@ const noLoadResources = [
  */
 async function getScripts(browser, uri, hashes) {
 	const page = await browser.newPage();
+	page.setUserAgent(userAgent);
 	await page.goto(baseURL + uri);
 
 	log("looking for scripts at %s", uri);

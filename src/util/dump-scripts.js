@@ -1,7 +1,6 @@
 const { log } = require("./log.js");
 const filter = require("./filter.js");
-
-const got = require("got");
+const got = require("./got.js");
 
 const format = require("string-format");
 const beautify = require("js-beautify").js;
