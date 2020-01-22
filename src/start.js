@@ -12,6 +12,7 @@ const transformersGlobal = {
 
 const getScripts = require("./util/get-scripts.js");
 const dumpScripts = require("./util/dump-scripts.js");
+const getToken = require("./util/get-token.js");
 
 /**
  * Runs the dataminer.
@@ -37,9 +38,17 @@ async function start(args) {
 	});
 	log("launched browser");
 
+	const token = await getToken(args.redditUsername, args.redditPassword);
+	log("got reddit session token: '%s'", token);
+	const sessionCookie = {
+		domain: ".reddit.com",
+		name: "reddit-session",
+		value: token,
+	};
+
 	const scriptsSet = new Set();
 	for (const place of args.places) {
-		const placeScripts = await getScripts(browser, place, hashes);
+		const placeScripts = await getScripts(browser, place, hashes, sessionCookie);
 		for (const placeScript of placeScripts) {
 			scriptsSet.add(placeScript);
 		}

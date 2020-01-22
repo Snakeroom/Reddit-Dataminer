@@ -24,6 +24,8 @@ cli
 	])
 	.option("--hashes [hashes]", "A path to hashes, to prevent archiving a file if its hash is the same.", cli.STRING)
 	.option("--no-sandbox", "Whether the Puppeteer sandbox should be enabled.", cli.BOOLEAN)
+	.option("--reddit-username [reddit-username]", "The Reddit user's username.", cli.STRING)
+	.option("--reddit-password [reddit-password]", "The Reddit user's password.", cli.STRING)
 	.action((arguments2, options) => {
 		const args = Object.assign(arguments2, options);
 		debug.enable(args.debug);
