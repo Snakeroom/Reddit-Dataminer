@@ -12,12 +12,6 @@ cli
 	.command("start", "Starts the script dumper.")
 	.option(...debugOpt)
 	.option("--path [path]", "The output path.", cli.STRING, null, true)
-	.option("--places [places...]", "The URIs to get script sources from.", cli.ARRAY, [
-		"/",
-		"/rpan",
-		"/coins",
-		"/premium",
-	])
 	.option("--banner [banner]", "The banner comment supporting placeholders", cli.ARRAY, [
 		"{URL}",
 		"Retrieved at {DATE} by Reddit Dataminer v{VERSION}",

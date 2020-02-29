@@ -11,6 +11,7 @@ const transformersGlobal = {
 };
 
 const getScripts = require("./util/get-scripts.js");
+const getRuntimeScripts = require("./util/get-runtime-scripts.js");
 const dumpScripts = require("./util/dump-scripts.js");
 const getToken = require("./util/get-token.js");
 
@@ -51,12 +52,20 @@ async function start(args) {
 	};
 
 	const scriptsSet = new Set();
-	for (const place of args.places) {
-		const placeScripts = await getScripts(browser, place, hashes, sessionCookie);
-		for (const placeScript of placeScripts) {
-			scriptsSet.add(placeScript);
+
+	const placeScripts = await getScripts(browser, hashes, sessionCookie);
+	for (const placeScript of placeScripts) {
+		scriptsSet.add(placeScript);
+
+		if (placeScript.startsWith("https://www.redditstatic.com/desktop2x/runtime~Reddit.")) {
+			const runtimeScripts = await getRuntimeScripts(placeScript, hashes);
+			console.log(runtimeScripts);
+			for (const runtimeScript of runtimeScripts) {
+				scriptsSet.add(runtimeScript);
+			}
 		}
 	}
+
 	const scripts = [...scriptsSet];
 	log("got list of scripts to dump");
 

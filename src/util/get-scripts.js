@@ -13,25 +13,25 @@ const noLoadResources = [
 ];
 
 /**
- * Gets a list of scripts to dump from a URI.
+ * Gets a list of scripts to dump.
  * @param {Browser} browser The browser to fetch the page's scripts from.
- * @param {string} uri The URI to locate scripts on.
  * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
  * @param {Object} sessionCookie The cookie for the Reddit session.
  * @returns {string[]} The script URLs.
  */
-async function getScripts(browser, uri, hashes, sessionCookie) {
+async function getScripts(browser, hashes, sessionCookie) {
 	const page = await browser.newPage();
 	await page.setUserAgent(userAgent);
+	await page.setJavaScriptEnabled(false);
 	page.setDefaultTimeout(0);
 
 	if (sessionCookie) {
 		page.setCookie(sessionCookie);
 	}
 
-	await page.goto(baseURL + uri);
+	await page.goto(baseURL);
 
-	log("looking for scripts at %s", uri);
+	log("looking for scripts with browser");
 
 	await page.setRequestInterception(true);
 	page.on("request", request => {
@@ -46,9 +46,13 @@ async function getScripts(browser, uri, hashes, sessionCookie) {
 
 	const scriptElems = await page.$$("script");
 	for (const script of scriptElems) {
-		scripts.push(await page.evaluate(element => element.src, script));
+		const source = await page.evaluate(element => {
+			return element.src;
+		}, script);
+		scripts.push(source);
 	}
 
+	log("found browser scripts");
 	return scripts.filter(source => {
 		const match = source.match(filter);
 		if (match === null) return false;
