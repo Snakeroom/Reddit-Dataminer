@@ -10,20 +10,24 @@ const userAgent = require("./user-agent.js");
  * @returns {string} The access token.
  */
 async function getToken(username, password) {
-	const form = new FormData();
-	form.append("user", username);
-	form.append("passwd", password);
-	form.append("api_type", "json");
+	if (username && password) {
+		const form = new FormData();
+		form.append("user", username);
+		form.append("passwd", password);
+		form.append("api_type", "json");
 
-	const response = await got.post({
-		body: form,
-		headers: {
-			"User-Agent": userAgent,
-		},
-		responseType: "json",
-		url: "https://ssl.reddit.com/api/login",
-	});
+		const response = await got.post({
+			body: form,
+			headers: {
+				"User-Agent": userAgent,
+			},
+			responseType: "json",
+			url: "https://ssl.reddit.com/api/login",
+		});
 
-	return encodeURIComponent(response.body.json.data.cookie);
+		return encodeURIComponent(response.body.json.data.cookie);
+	}
+
+	return "";
 }
 module.exports = getToken;

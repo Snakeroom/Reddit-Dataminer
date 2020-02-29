@@ -39,7 +39,11 @@ async function start(args) {
 	log("launched browser");
 
 	const token = await getToken(args.redditUsername, args.redditPassword);
-	log("got reddit session token: '%s'", token);
+	if (token) {
+		log("got reddit session token: '%s'", token);
+	} else {
+		log("not using a reddit session token");
+	}
 	const sessionCookie = {
 		domain: ".reddit.com",
 		name: "reddit-session",
