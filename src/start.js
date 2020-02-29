@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 
-const { log } = require("./util/log.js");
+const { log, hashes: hashesLog } = require("./util/log.js");
 
 const fse = require("fs-extra");
 
@@ -25,11 +25,11 @@ async function start(args) {
 	log("ensured output path exists");
 
 	const hashes = await fse.readJSON(args.hashes).then(json => {
-		log("loaded hashes from %s", args.hashes);
+		hashesLog("loaded hashes from %s", args.hashes);
 		return json;
 	}).catch(() => {
 		if (args.hashes) {
-			log("failed to load hashes");
+			hashesLog("failed to load hashes");
 		}
 		return {};
 	});
@@ -59,7 +59,6 @@ async function start(args) {
 
 		if (placeScript.startsWith("https://www.redditstatic.com/desktop2x/runtime~Reddit.")) {
 			const runtimeScripts = await getRuntimeScripts(placeScript, hashes);
-			console.log(runtimeScripts);
 			for (const runtimeScript of runtimeScripts) {
 				scriptsSet.add(runtimeScript);
 			}

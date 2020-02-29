@@ -1,7 +1,7 @@
 const got = require("got");
 const esprima = require("esprima");
 
-const { log } = require("./log.js");
+const { log, hashes: hashesLog } = require("./log.js");
 
 /**
  * Gets scripts from the runtime script.
@@ -37,6 +37,7 @@ async function getRuntimeScripts(url, hashes) {
 
 	// Convert object to script array
 	return Object.entries(scriptObj).filter(([name, hash]) => {
+		hashesLog("skipping %s as its hash has not changed", name);
 		return hashes[name] === hash;
 	}).map(([name, hash]) => {
 		return "https://www.redditstatic.com/desktop2x/" + name + "." + hash + ".js";

@@ -1,6 +1,6 @@
 const baseURL = "https://new.reddit.com";
 
-const { log } = require("./log.js");
+const { log, hashes: hashesLog } = require("./log.js");
 const filter = require("./filter.js");
 const userAgent = require("./user-agent.js");
 
@@ -58,7 +58,11 @@ async function getScripts(browser, hashes, sessionCookie) {
 		if (match === null) return false;
 
 		// Ignore script if it has the same hash as saved before
-		if (hashes[match[1]] === match[2]) return false;
+		if (hashes[match[1]] === match[2]) {
+			hashesLog("skipping %s as its hash has not changed", match[1]);
+			return false;
+		}
+
 		return true;
 	});
 }
