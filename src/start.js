@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 
-const { log } = require("./util/log.js");
+const { log, hashes: hashesLog } = require("./util/log.js");
 
 const fse = require("fs-extra");
 
@@ -72,10 +72,10 @@ async function start(args) {
 
 	if (args.hashes) {
 		await fse.writeJSON(args.hashes, hashes).then(written => {
-			log("saved new hashes to %s", args.hashes);
+			hashesLog("saved new hashes to %s", args.hashes);
 			return written;
 		}).catch(() => {
-			log("failed to save new hashes");
+			hashesLog("failed to save new hashes");
 		});
 	}
 
