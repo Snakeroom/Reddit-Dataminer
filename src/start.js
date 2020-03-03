@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 
-const { log, hashes: hashesLog } = require("./util/log.js");
+const { log } = require("./util/log.js");
 
 const fse = require("fs-extra");
 
@@ -10,6 +10,7 @@ const transformersGlobal = {
 	VERSION: version,
 };
 
+const getHashes = require("./util/get-hashes.js");
 const getScripts = require("./util/get-scripts.js");
 const getRuntimeScripts = require("./util/get-runtime-scripts.js");
 const dumpScripts = require("./util/dump-scripts.js");
@@ -24,21 +25,7 @@ async function start(args) {
 	await fse.ensureDir(args.path);
 	log("ensured output path exists");
 
-	const hashes = await fse.readJSON(args.hashes).then(json => {
-		hashesLog("loaded hashes from %s", args.hashes);
-		return json;
-	}).catch(async error => {
-		if (args.hashes) {
-			if (error.code === "ENOENT") {
-				await fse.writeJSON(args.hashes, {});
-				hashesLog("created hashes");
-				return {};
-			}
-
-			hashesLog("failed to load hashes");
-		}
-		return {};
-	});
+	const hashes = await getHashes(args.hashes);
 
 	const browser = await puppeteer.launch({
 		args: args.noSandbox ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
