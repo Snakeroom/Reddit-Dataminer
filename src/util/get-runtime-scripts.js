@@ -39,9 +39,9 @@ async function getRuntimeScripts(url, hashes) {
 	return Object.entries(scriptObj).filter(([name, hash]) => {
 		if (hashes[name] === hash) {
 			hashesLog("skipping %s as its hash has not changed", name);
-			return true;
+			return false;
 		}
-		return false;
+		return true;
 	}).map(([name, hash]) => {
 		return "https://www.redditstatic.com/desktop2x/" + name + "." + hash + ".js";
 	});
