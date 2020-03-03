@@ -27,8 +27,14 @@ async function start(args) {
 	const hashes = await fse.readJSON(args.hashes).then(json => {
 		hashesLog("loaded hashes from %s", args.hashes);
 		return json;
-	}).catch(() => {
+	}).catch(async error => {
 		if (args.hashes) {
+			if (error.code === "ENOENT") {
+				await fse.writeJSON(args.hashes, {});
+				hashesLog("created hashes");
+				return {};
+			}
+
 			hashesLog("failed to load hashes");
 		}
 		return {};
