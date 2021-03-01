@@ -7,8 +7,9 @@ const { log, hashes: hashesLog } = require("./log.js");
  * Gets scripts from the runtime script.
  * @param {string} url The URL of the runtime script.
  * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
+ * @param {integer} mapIndex The index of the object mapping file names to hashes in the runtime script.
  */
-async function getRuntimeScripts(url, hashes) {
+async function getRuntimeScripts(url, hashes, mapIndex = 1) {
 	log("looking for scripts with runtime script");
 
 	// Fetch runtime script
@@ -31,7 +32,7 @@ async function getRuntimeScripts(url, hashes) {
 			}
 		}
 	});
-	const scriptObj = objs[objs.length - 1];
+	const scriptObj = objs[mapIndex < 0 ? objs.length - mapIndex : mapIndex];
 
 	log("found runtime script scripts");
 

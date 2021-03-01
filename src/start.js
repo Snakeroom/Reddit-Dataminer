@@ -51,7 +51,7 @@ async function start(args) {
 		scriptsSet.add(placeScript);
 
 		if (placeScript.startsWith("https://www.redditstatic.com/desktop2x/runtime~Reddit.")) {
-			const runtimeScripts = await getRuntimeScripts(placeScript, hashes);
+			const runtimeScripts = await getRuntimeScripts(placeScript, hashes, args.mapIndex);
 			for (const runtimeScript of runtimeScripts) {
 				scriptsSet.add(runtimeScript);
 			}
