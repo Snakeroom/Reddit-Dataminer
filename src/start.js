@@ -46,7 +46,7 @@ async function start(args) {
 
 	const scriptsSet = new Set();
 
-	const placeScripts = await getScripts(browser, hashes, sessionCookie);
+	const placeScripts = await getScripts(browser, hashes, sessionCookie, args.cache);
 	for (const placeScript of placeScripts) {
 		scriptsSet.add(placeScript);
 

@@ -17,12 +17,14 @@ const noLoadResources = [
  * @param {Browser} browser The browser to fetch the page's scripts from.
  * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
  * @param {Object} sessionCookie The cookie for the Reddit session.
+ * @param {boolean} cache Whether the browser cache should be enabled.
  * @returns {string[]} The script URLs.
  */
-async function getScripts(browser, hashes, sessionCookie) {
+async function getScripts(browser, hashes, sessionCookie, cache = false) {
 	const page = await browser.newPage();
 	await page.setUserAgent(userAgent);
 	await page.setJavaScriptEnabled(false);
+	await page.setCacheEnabled(cache);
 	page.setDefaultTimeout(0);
 
 	if (sessionCookie) {

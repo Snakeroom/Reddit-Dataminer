@@ -18,6 +18,7 @@ cli
 	])
 	.option("--hashes [hashes]", "A path to hashes, to prevent archiving a file if its hash is the same.", cli.STRING)
 	.option("--no-sandbox", "Whether the Puppeteer sandbox should be enabled.", cli.BOOLEAN)
+	.option("--cache", "Whether the Puppeteer cache should be enabled.", cli.BOOLEAN, false)
 	.option("--map-index [map-index]", "The index of the object mapping file names to hashes in the runtime script.", cli.INTEGER, 1)
 	.option("--reddit-username [reddit-username]", "The Reddit user's username.", cli.STRING)
 	.option("--reddit-password [reddit-password]", "The Reddit user's password.", cli.STRING)
