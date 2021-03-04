@@ -39,8 +39,12 @@ program
 		validator: program.BOOLEAN,
 	})
 	.option("--map-index [map-index]", "The index of the object mapping file names to hashes in the runtime script.", {
-		default: 1,
+		default: 0,
 		validator: program.NUMBER,
+	})
+	.option("--map-before-js", "Whether to filter runtime script objects by whether they are before a \".js\" string literal.", {
+		default: true,
+		validator: program.BOOLEAN,
 	})
 	.option("--reddit-username [reddit-username]", "The Reddit user's username.", {
 		validator: program.STRING,
