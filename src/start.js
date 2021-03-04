@@ -1,6 +1,6 @@
 const puppeteer = require("puppeteer");
 
-const { log, hashes: hashesLog } = require("./util/log.js");
+const { log, dumping: dumpingLog, hashes: hashesLog } = require("./util/log.js");
 
 const fse = require("fs-extra");
 
@@ -68,9 +68,9 @@ async function start(args) {
 	};
 
 	if (await dumpScripts(scripts, transformersRun, args, hashes)) {
-		log("finished dumping all scripts");
+		dumpingLog("finished dumping all scripts");
 	} else {
-		log("failed to dump all scripts");
+		dumpingLog("failed to dump all scripts");
 	}
 
 	if (args.hashes) {
