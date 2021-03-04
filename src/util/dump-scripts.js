@@ -76,7 +76,7 @@ async function dumpScripts(scripts, transformersRun, args, hashes) {
 		return true;
 	}
 
-	Promise.all(scripts.map(async (script, index) => {
+	await Promise.all(scripts.map(async (script, index) => {
 		const match = script.match(filter);
 		try {
 			await dumpScript(script, match, index, transformersRun, args, hashes);
