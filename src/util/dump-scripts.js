@@ -9,6 +9,47 @@ const path = require("path");
 const fse = require("fs-extra");
 
 /**
+ * Dumps a single script and saves it.
+ * @param {string} script The script to dump.
+ * @param {RegExpMatchArray} match The match of script to dump.
+ * @param {number} index The index of the script to dump.
+ * @param {Object} transformersRun The run-specific transformers.
+ * @param {Object} args The command-line arguments.
+ * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
+ * @returns {Promise<boolean>} Whether dumping was attempted for all scripts.
+ */
+async function dumpScript(script, match, index, transformersRun, args, hashes) {
+	const response = await got(script);
+	const beautified = beautify(response.body, {
+		/* eslint-disable-next-line camelcase */
+		indent_with_tabs: true,
+	});
+
+	/**
+	 * The script-specific transformers.
+	 */
+	const transformersScript = {
+		...transformersRun,
+		CHAR_COUNT: beautified.length,
+		FILE_NAME: match[1] + ".js",
+		FILE_NAME_HASHED: `${match[1]}.${match[2]}.js`,
+		HASH: match[2],
+		LINE_COUNT: beautified.split("\n").length,
+		SCRIPT_INDEX: index + 1,
+		URL: script,
+	};
+
+	const header = args.banner.length > 0 ? args.banner.map(line => {
+		return "// " + format(line, transformersScript);
+	}).join("\n") + "\n" : "";
+
+	await fse.ensureFile(path.resolve(args.path, "./" + match[1] + ".js"));
+	await fse.writeFile(path.resolve(args.path, "./" + match[1] + ".js"), header + beautified);
+
+	hashes[match[1]] = match[2];
+}
+
+/**
  * Dumps the scripts and saves them.
  * @param {string[]} scripts The scripts to dump.
  * @param {Object} transformersRun The run-specific transformers.
@@ -17,50 +58,33 @@ const fse = require("fs-extra");
  * @returns {Promise<boolean>} Whether dumping was attempted for all scripts.
  */
 async function dumpScripts(scripts, transformersRun, args, hashes) {
-	let index = 0;
-	for (const script of scripts) {
-		const match = script.match(filter);
-
-		try {
-			const response = await got(script);
-			const beautified = beautify(response.body, {
-				/* eslint-disable-next-line camelcase */
-				indent_with_tabs: true,
-			});
-
-			/**
-			 * The script-specific transformers.
-			 */
-			const transformersScript = {
-				...transformersRun,
-				CHAR_COUNT: beautified.length,
-				FILE_NAME: match[1] + ".js",
-				FILE_NAME_HASHED: `${match[1]}.${match[2]}.js`,
-				HASH: match[2],
-				LINE_COUNT: beautified.split("\n").length,
-				SCRIPT_INDEX: index + 1,
-				URL: script,
-			};
-
-			const header = args.banner.length > 0 ? args.banner.map(line => {
-				return "// " + format(line, transformersScript);
-			}).join("\n") + "\n" : "";
-
-			await fse.ensureFile(path.resolve(args.path, "./" + match[1] + ".js"));
-			await fse.writeFile(path.resolve(args.path, "./" + match[1] + ".js"), header + beautified);
-
-			hashes[match[1]] = match[2];
-
-			log("dumped %s", match[1]);
-		} catch (error) {
-			log("failed to dump %s: %O", script, error);
-			if (args.stopDumpingAfterFail) {
+	// Use a for-loop to allow an early return
+	// This is not concurrent
+	if (args.stopDumpingAfterFail) {
+		let index = 0;
+		for (const script of scripts) {
+			const match = script.match(filter);
+			try {
+				await dumpScript(script, match, index, transformersRun, args, hashes);
+				log("dumped %s", match[1]);
+			} catch (error) {
+				log("failed to dump %s: %O", script, error);
 				return false;
 			}
+			index += 1;
 		}
-
-		index += 1;
+		return true;
 	}
+
+	Promise.all(scripts.map(async (script, index) => {
+		const match = script.match(filter);
+		try {
+			await dumpScript(script, match, index, transformersRun, args, hashes);
+			log("dumped %s", match[1]);
+		} catch (error) {
+			log("failed to dump %s: %o", script, error);
+		}
+	}));
 	return true;
 }
 module.exports = dumpScripts;
