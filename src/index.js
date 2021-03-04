@@ -48,11 +48,9 @@ program
 	.option("--reddit-password [reddit-password]", "The Reddit user's password.", {
 		validator: program.STRING,
 	})
-	.action((arguments2, options) => {
-		const args = Object.assign(arguments2, options);
-		debug.enable(args.debug);
-
-		start(args);
+	.action(({ options }) => {
+		debug.enable(options.debug);
+		start(options);
 	});
 
 program.run(process.argv.slice(2));
