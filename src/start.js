@@ -17,6 +17,14 @@ const dumpScripts = require("./util/dump-scripts.js");
 const getToken = require("./util/get-token.js");
 
 /**
+ * Arguments to be passed to Puppeteer if the sandbox option is disabled.
+ */
+const noSandboxArgs = [
+	"--no-sandbox",
+	"--disable-setuid-sandbox",
+];
+
+/**
  * Runs the dataminer.
  * @param {Object} args The command-line arguments.
  */
@@ -28,7 +36,7 @@ async function start(args) {
 	const hashes = await getHashes(args.hashes);
 
 	const browser = await puppeteer.launch({
-		args: args.noSandbox ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
+		args: args.sandbox ? [] : noSandboxArgs,
 	});
 	log("launched browser");
 

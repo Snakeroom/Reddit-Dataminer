@@ -31,7 +31,8 @@ program
 	.option("--hashes [hashes]", "A path to hashes, to prevent archiving a file if its hash is the same.", {
 		validator: program.STRING,
 	})
-	.option("--no-sandbox", "Whether the Puppeteer sandbox should be enabled.", {
+	.option("--sandbox", "Whether the Puppeteer sandbox should be enabled.", {
+		default: true,
 		validator: program.BOOLEAN,
 	})
 	.option("--cache", "Whether the Puppeteer cache should be enabled.", {
