@@ -52,6 +52,10 @@ program
 	.option("--reddit-password [reddit-password]", "The Reddit user's password.", {
 		validator: program.STRING,
 	})
+	.option("--stop-dumping-after-fail", "Whether to stop dumping once a single file fails to be dumped.", {
+		default: false,
+		validator: program.BOOLEAN,
+	})
 	.action(({ options }) => {
 		debug.enable(options.debug);
 		start(options);

@@ -67,8 +67,11 @@ async function start(args) {
 		SCRIPT_TOTAL: scripts.length,
 	};
 
-	await dumpScripts(scripts, transformersRun, args, hashes);
-	log("finished dumping all scripts");
+	if (await dumpScripts(scripts, transformersRun, args, hashes)) {
+		log("finished dumping all scripts");
+	} else {
+		log("failed to dump all scripts");
+	}
 
 	if (args.hashes) {
 		await fse.writeJSON(args.hashes, hashes).then(written => {

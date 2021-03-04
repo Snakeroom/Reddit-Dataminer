@@ -14,10 +14,11 @@ const fse = require("fs-extra");
  * @param {Object} transformersRun The run-specific transformers.
  * @param {Object} args The command-line arguments.
  * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
- * @returns {Promise}
+ * @returns {Promise<boolean>} Whether dumping was attempted for all scripts.
  */
-function dumpScripts(scripts, transformersRun, args, hashes) {
-	return Promise.all(scripts.map(async (script, index) => {
+async function dumpScripts(scripts, transformersRun, args, hashes) {
+	let index = 0;
+	for (const script of scripts) {
 		const match = script.match(filter);
 
 		try {
@@ -52,8 +53,14 @@ function dumpScripts(scripts, transformersRun, args, hashes) {
 
 			log("dumped %s", match[1]);
 		} catch (error) {
-			log("failed to dump %s: %o", script, error);
+			log("failed to dump %s: %O", script, error);
+			if (args.stopDumpingAfterFail) {
+				return false;
+			}
 		}
-	}));
+
+		index += 1;
+	}
+	return true;
 }
 module.exports = dumpScripts;
