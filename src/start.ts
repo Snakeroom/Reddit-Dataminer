@@ -1,20 +1,18 @@
-const puppeteer = require("puppeteer");
+import { dumping as dumpingLog, hashes as hashesLog, log } from "./util/log";
+import puppeteer, { SetCookie } from "puppeteer";
 
-const { log, dumping: dumpingLog, hashes: hashesLog } = require("./util/log.js");
-
-const fse = require("fs-extra");
-
-const { version } = require("../package.json");
+import { RedditDataminerOptions } from "./util/options";
+import dumpScripts from "./util/dump-scripts";
+import fse from "fs-extra";
+import getHashes from "./util/get-hashes";
+import getRuntimeScripts from "./util/get-runtime-scripts";
+import getScripts from "./util/get-scripts";
+import getToken from "./util/get-token";
+import { version } from "./util/version";
 
 const transformersGlobal = {
 	VERSION: version,
 };
-
-const getHashes = require("./util/get-hashes.js");
-const getScripts = require("./util/get-scripts.js");
-const getRuntimeScripts = require("./util/get-runtime-scripts.js");
-const dumpScripts = require("./util/dump-scripts.js");
-const getToken = require("./util/get-token.js");
 
 /**
  * Arguments to be passed to Puppeteer if the sandbox option is disabled.
@@ -26,9 +24,9 @@ const noSandboxArgs = [
 
 /**
  * Runs the dataminer.
- * @param {Object} args The command-line arguments.
+ * @param args The command-line arguments.
  */
-async function start(args) {
+export default async function start(args: RedditDataminerOptions): Promise<string[]> {
 	log(args);
 	await fse.ensureDir(args.path);
 	log("ensured output path exists");
@@ -46,13 +44,13 @@ async function start(args) {
 	} else {
 		log("not using a reddit session token");
 	}
-	const sessionCookie = {
+	const sessionCookie: SetCookie = {
 		domain: ".reddit.com",
 		name: "reddit-session",
 		value: token,
 	};
 
-	const scriptsSet = new Set();
+	const scriptsSet: Set<string> = new Set();
 
 	const placeScripts = await getScripts(browser, hashes, sessionCookie, args.cache);
 	for (const placeScript of placeScripts) {
@@ -69,10 +67,10 @@ async function start(args) {
 	const scripts = [...scriptsSet];
 	log("got list of scripts to dump");
 
-	const transformersRun = {
+	const transformersRun: Record<string, string> = {
 		...transformersGlobal,
 		DATE: new Date().toLocaleString("en-US"),
-		SCRIPT_TOTAL: scripts.length,
+		SCRIPT_TOTAL: scripts.length + "",
 	};
 
 	if (await dumpScripts(scripts, transformersRun, args, hashes)) {
@@ -95,4 +93,3 @@ async function start(args) {
 	await browser.close();
 	return scripts;
 }
-module.exports = start;

@@ -1,25 +1,23 @@
-const { dumping: log } = require("./log.js");
-const filter = require("./filter.js");
-const got = require("./got.js");
-
-const format = require("string-format");
-const beautify = require("js-beautify").js;
-
-const path = require("path");
-const fse = require("fs-extra");
+import { RedditDataminerOptions } from "./options";
+import beautify from "js-beautify";
+import { filter } from "./filter";
+import format from "string-format";
+import fse from "fs-extra";
+import { dumping as log } from "./log";
+import path from "path";
+import { uaGot } from "./got";
 
 /**
  * Dumps a single script and saves it.
- * @param {string} script The script to dump.
- * @param {RegExpMatchArray} match The match of script to dump.
- * @param {number} index The index of the script to dump.
- * @param {Object} transformersRun The run-specific transformers.
- * @param {Object} args The command-line arguments.
- * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
- * @returns {Promise<boolean>} Whether dumping was attempted for all scripts.
+ * @param script The script to dump.
+ * @param match The match of script to dump.
+ * @param index The index of the script to dump.
+ * @param transformersRun The run-specific transformers.
+ * @param args The command-line arguments.
+ * @param hashes The hashes for previously-saved scripts.
  */
-async function dumpScript(script, match, index, transformersRun, args, hashes) {
-	const response = await got(script);
+async function dumpScript(script: string, match: RegExpMatchArray, index: number, transformersRun: Record<string, string>, args: RedditDataminerOptions, hashes: Record<string, string>): Promise<void> {
+	const response = await uaGot(script);
 	const beautified = beautify(response.body, {
 		/* eslint-disable-next-line camelcase */
 		indent_with_tabs: true,
@@ -51,13 +49,13 @@ async function dumpScript(script, match, index, transformersRun, args, hashes) {
 
 /**
  * Dumps the scripts and saves them.
- * @param {string[]} scripts The scripts to dump.
- * @param {Object} transformersRun The run-specific transformers.
- * @param {Object} args The command-line arguments.
- * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
- * @returns {Promise<boolean>} Whether dumping was attempted for all scripts.
+ * @param scripts The scripts to dump.
+ * @param transformersRun The run-specific transformers.
+ * @param args The command-line arguments.
+ * @param hashes The hashes for previously-saved scripts.
+ * @returns Whether dumping was attempted for all scripts.
  */
-async function dumpScripts(scripts, transformersRun, args, hashes) {
+export default async function dumpScripts(scripts: string[], transformersRun: Record<string, string>, args: RedditDataminerOptions, hashes: Record<string, string>): Promise<boolean> {
 	// Use a for-loop to allow an early return
 	// This is not concurrent
 	if (args.stopDumpingAfterFail) {
@@ -87,4 +85,3 @@ async function dumpScripts(scripts, transformersRun, args, hashes) {
 	}));
 	return true;
 }
-module.exports = dumpScripts;

@@ -1,13 +1,12 @@
-const fse = require("fs-extra");
-
-const { hashes: hashesLog } = require("./log.js");
+import fse from "fs-extra";
+import { hashes as hashesLog } from "./log";
 
 /**
  * Loads or initializes the hashes file.
- * @param {string} path The path to get the hashes file from.
- * @returns {Object.<string, string>} The loaded hashes for previously-saved scripts.
+ * @param path The path to get the hashes file from.
+ * @returns The loaded hashes for previously-saved scripts.
  */
-function getHashes(path) {
+export default function getHashes(path: string): Promise<Record<string, string>> {
 	return fse.readJSON(path).then(json => {
 		hashesLog("loaded hashes from %s", path);
 		return json;
@@ -24,4 +23,3 @@ function getHashes(path) {
 		return {};
 	});
 }
-module.exports = getHashes;

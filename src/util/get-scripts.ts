@@ -1,8 +1,10 @@
-const baseURL = "https://new.reddit.com";
+import { Browser, SetCookie } from "puppeteer";
+import { hashes as hashesLog, log } from "./log";
 
-const { log, hashes: hashesLog } = require("./log.js");
-const filter = require("./filter.js");
-const userAgent = require("./user-agent.js");
+import { filter } from "./filter";
+import { userAgent } from "./user-agent";
+
+const baseURL = "https://new.reddit.com";
 
 const noLoadResources = [
 	"script",
@@ -14,13 +16,13 @@ const noLoadResources = [
 
 /**
  * Gets a list of scripts to dump.
- * @param {Browser} browser The browser to fetch the page's scripts from.
- * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
- * @param {Object} sessionCookie The cookie for the Reddit session.
- * @param {boolean} cache Whether the browser cache should be enabled.
- * @returns {string[]} The script URLs.
+ * @param browser The browser to fetch the page's scripts from.
+ * @param hashes The hashes for previously-saved scripts.
+ * @param sessionCookie The cookie for the Reddit session.
+ * @param cache Whether the browser cache should be enabled.
+ * @returns The script URLs.
  */
-async function getScripts(browser, hashes, sessionCookie, cache = false) {
+export default async function getScripts(browser: Browser, hashes: Record<string, string>, sessionCookie: SetCookie, cache = false): Promise<string[]> {
 	const page = await browser.newPage();
 	await page.setUserAgent(userAgent);
 	await page.setJavaScriptEnabled(false);
@@ -68,4 +70,3 @@ async function getScripts(browser, hashes, sessionCookie, cache = false) {
 		return true;
 	});
 }
-module.exports = getScripts;

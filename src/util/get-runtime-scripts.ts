@@ -1,16 +1,16 @@
-const got = require("got");
-const getHashObjects = require("./get-hash-objects.js");
+import { hashes as hashesLog, log } from "./log";
 
-const { log, hashes: hashesLog } = require("./log.js");
+import getHashObjects from "./get-hash-objects";
+import got from "got";
 
 /**
  * Gets scripts from the runtime script.
- * @param {string} url The URL of the runtime script.
- * @param {Object.<string, string>} hashes The hashes for previously-saved scripts.
- * @param {integer} mapIndex The index of the object mapping file names to hashes in the runtime script.
- * @param {boolean} mapBeforeJs Whether to filter runtime script objects by whether they are before a `".js"` string literal.
+ * @param url The URL of the runtime script.
+ * @param hashes The hashes for previously-saved scripts.
+ * @param mapIndex The index of the object mapping file names to hashes in the runtime script.
+ * @param mapBeforeJs Whether to filter runtime script objects by whether they are before a `".js"` string literal.
  */
-async function getRuntimeScripts(url, hashes, mapIndex = 1, mapBeforeJs = true) {
+export default async function getRuntimeScripts(url: string, hashes: Record<string, string>, mapIndex = 1, mapBeforeJs = true): Promise<string[]> {
 	log("looking for scripts with runtime script");
 
 	// Fetch runtime script
@@ -35,4 +35,3 @@ async function getRuntimeScripts(url, hashes, mapIndex = 1, mapBeforeJs = true) 
 		return "https://www.redditstatic.com/desktop2x/" + name + "." + hash + ".js";
 	});
 }
-module.exports = getRuntimeScripts;

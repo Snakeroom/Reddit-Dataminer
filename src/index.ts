@@ -1,18 +1,11 @@
-const { program } = require("@caporal/core");
-const { debug } = require("./util/log.js");
+import { RedditDataminerOptions, debugOpt } from "./util/options";
 
-const start = require("./start.js");
+import debug from "debug";
+import { program } from "@caporal/core";
+import start from "./start";
+import { version } from "./util/version";
 
-const { version } = require("../package.json");
 program.version(version);
-
-/**
- * @type {[string, string, import('@caporal/core').CreateOptionCommandOpts]}
- */
-const debugOpt = ["--debug [debug]", "Debuggers to enable.", {
-	default: "reddit-dataminer:*",
-	validator: program.STRING,
-}];
 
 program
 	.command("start", "Starts the script dumper.")
@@ -57,7 +50,9 @@ program
 		default: false,
 		validator: program.BOOLEAN,
 	})
-	.action(({ options }) => {
+	.action(params => {
+		const options = params.options as unknown as RedditDataminerOptions;
+
 		debug.enable(options.debug);
 		start(options);
 	});
