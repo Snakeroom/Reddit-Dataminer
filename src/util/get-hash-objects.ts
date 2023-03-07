@@ -58,7 +58,7 @@ export default function getHashObjects(program: string, beforeJs = false): Recor
 			objects.push(convertObjectExpressionToObject(node));
 		} else if (beforeJs && isJsLiteral(node) && objects.length > 0) {
 			return [
-				objects[objects.length - 1],
+				objects.at(-1),
 			];
 		}
 	}

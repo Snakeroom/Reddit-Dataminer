@@ -4,7 +4,7 @@ import { filter } from "./filter";
 import format from "string-format";
 import fse from "fs-extra";
 import { dumping as log } from "./log";
-import path from "path";
+import path from "node:path";
 import { uaGot } from "./got";
 
 /**

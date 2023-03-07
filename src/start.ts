@@ -80,12 +80,14 @@ export default async function start(args: RedditDataminerOptions): Promise<strin
 	}
 
 	if (args.hashes) {
-		await fse.writeJSON(args.hashes, hashes).then(written => {
-			hashesLog("saved new hashes to %s", args.hashes);
-			return written;
-		}).catch(() => {
-			hashesLog("failed to save new hashes");
-		});
+		await fse.writeJSON(args.hashes, hashes)
+			.then(written => {
+				hashesLog("saved new hashes to %s", args.hashes);
+				return written;
+			})
+			.catch(() => {
+				hashesLog("failed to save new hashes");
+			});
 	}
 
 	// Clean up
