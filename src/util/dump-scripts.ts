@@ -1,13 +1,13 @@
 import { RedditDataminerOptions } from "./options";
 import { ScriptInfo } from "../script-info";
 import { addModuleSuffix } from "./module-suffix";
-import beautify from "js-beautify";
 import format from "string-format";
 import fse from "fs-extra";
 import isPathInside from "is-path-inside";
 import { dumping as log } from "./log";
 import { parse } from "acorn";
 import { resolve } from "node:path";
+import { serializeModule } from "./serialize-module";
 import { splitModules } from "./split-modules";
 import { uaGot } from "./got";
 
@@ -57,20 +57,15 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 			const path = resolve(args.path, "./" + addModuleSuffix(moduleName, args.keepModuleSuffix));
 
 			if (isPathInside(path, args.path)) {
-				const moduleBody = toJs(moduleNode).value;
-
-				const beautified = beautify(moduleBody, {
-					/* eslint-disable-next-line camelcase */
-					indent_with_tabs: true,
-				});
+				const serialized = serializeModule(moduleNode, moduleName, toJs);
 
 				/**
 				 * The module-specific transformers.
 				 */
 				const transformersModule = {
 					...transformersScript,
-					CHAR_COUNT: beautified.length,
-					LINE_COUNT: beautified.split("\n").length,
+					CHAR_COUNT: serialized.length,
+					LINE_COUNT: serialized.split("\n").length,
 					MODULE_INDEX: moduleIndex + 1,
 					MODULE_NAME: moduleName,
 				};
@@ -80,7 +75,7 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 				}).join("\n") + "\n" : "";
 
 				await fse.ensureFile(path);
-				await fse.writeFile(path, header + beautified);
+				await fse.writeFile(path, header + serialized);
 
 				knownModules.add(moduleName);
 			} else {
