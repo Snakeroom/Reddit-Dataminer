@@ -52,7 +52,11 @@ export default async function start(args: RedditDataminerOptions): Promise<strin
 
 	const scriptsSet: Set<string> = new Set();
 
-	const placeScripts = await getScripts(browser, hashes, sessionCookie, args.cache);
+	const placeScripts = [
+		...await getScripts(browser, hashes, sessionCookie, args.cache),
+		...args.includeScriptUrl.map(url => url + ""),
+	];
+
 	for (const placeScript of placeScripts) {
 		scriptsSet.add(placeScript);
 

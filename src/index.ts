@@ -24,6 +24,10 @@ program
 	.option("--hashes [hashes]", "A path to hashes, to prevent archiving a file if its hash is the same.", {
 		validator: program.STRING,
 	})
+	.option("--include-script-url [script...]", "Adds additional script URLs to be archived.", {
+		default: [],
+		validator: program.ARRAY,
+	})
 	.option("--filter-script [script...]", "If provided, restricts archival to only the script names specified.", {
 		default: [],
 		validator: program.ARRAY,
