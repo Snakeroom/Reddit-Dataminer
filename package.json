@@ -31,8 +31,8 @@
 		"@types/string-format": "^2.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.54.1",
 		"@typescript-eslint/parser": "^5.54.1",
-		"eslint": "^8.35.0",
-		"eslint-config-haykam": "^1.19.0",
+		"eslint": "^8.57.0",
+		"eslint-config-haykam": "^1.21.0",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "^4.9.5"
 	},
@@ -54,8 +54,6 @@
 			"@typescript-eslint"
 		],
 		"rules": {
-			"semi": "off",
-			"@typescript-eslint/semi": "error",
 			"no-shadow": "off",
 			"@typescript-eslint/no-shadow": "error",
 			"sort-imports": "error",
