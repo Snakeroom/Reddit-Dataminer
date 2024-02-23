@@ -12,6 +12,8 @@ export interface RedditDataminerOptions {
 	hashes: string;
 	includeScriptUrl: string[];
 	filterScript: string[];
+	splitBundles: boolean;
+	keepModuleSuffix: string[];
 	sandbox: boolean;
 	cache: boolean;
 	mapIndex: number;

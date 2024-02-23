@@ -1,5 +1,4 @@
 import { filter } from "./util/filter";
-import path from "node:path";
 
 export class ScriptInfo {
 	private readonly url: string;
@@ -32,9 +31,5 @@ export class ScriptInfo {
 
 	getHash() {
 		return this.hash;
-	}
-
-	getPath(basePath: string): string {
-		return path.resolve(basePath, "./" + this.name + ".js");
 	}
 }

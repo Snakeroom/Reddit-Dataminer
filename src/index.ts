@@ -1,5 +1,6 @@
 import { RedditDataminerOptions, debugOpt } from "./util/options";
 
+import { DEFAULT_KEEP_MODULE_SUFFIX } from "./util/module-suffix";
 import debug from "debug";
 import { program } from "@caporal/core";
 import start from "./start";
@@ -30,6 +31,14 @@ program
 	})
 	.option("--filter-script [script...]", "If provided, restricts archival to only the script names specified.", {
 		default: [],
+		validator: program.ARRAY,
+	})
+	.option("--split-bundles", "Whether bundles should be split into their individual modules.", {
+		default: true,
+		validator: program.BOOLEAN,
+	})
+	.option("--keep-module-suffix [suffix...]", "Prevents suffixing '.js' to modules that already have one of the given suffixes.", {
+		default: DEFAULT_KEEP_MODULE_SUFFIX,
 		validator: program.ARRAY,
 	})
 	.option("--sandbox", "Whether the Puppeteer sandbox should be enabled.", {
