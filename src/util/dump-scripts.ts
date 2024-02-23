@@ -1,6 +1,7 @@
 import { RedditDataminerOptions } from "./options";
 import { ScriptInfo } from "../script-info";
 import { addModuleSuffix } from "./module-suffix";
+import { applySourceMap } from "./source-map";
 import format from "string-format";
 import fse from "fs-extra";
 import isPathInside from "is-path-inside";
@@ -28,6 +29,7 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 
 	const program = parse(response.body, {
 		ecmaVersion: "latest",
+		locations: true,
 	});
 
 	const name = script.getName();
@@ -35,6 +37,8 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 
 	/* eslint-disable-next-line no-eval -- CommonJS workaround */
 	const { toJs } = await eval("import(\"estree-util-to-js\")");
+
+	const transformersSourceMap = await applySourceMap(program, name, response.body);
 	const modules = splitModules(program, name, args);
 
 	/**
@@ -42,6 +46,7 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 	 */
 	const transformersScript = {
 		...transformersRun,
+		...transformersSourceMap,
 		FILE_NAME: name + ".js",
 		FILE_NAME_HASHED: `${name}.${hash}.js`,
 		HASH: hash,
