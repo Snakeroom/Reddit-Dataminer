@@ -24,6 +24,10 @@ program
 	.option("--hashes [hashes]", "A path to hashes, to prevent archiving a file if its hash is the same.", {
 		validator: program.STRING,
 	})
+	.option("--filter-script [script...]", "If provided, restricts archival to only the script names specified.", {
+		default: [],
+		validator: program.ARRAY,
+	})
 	.option("--sandbox", "Whether the Puppeteer sandbox should be enabled.", {
 		default: true,
 		validator: program.BOOLEAN,

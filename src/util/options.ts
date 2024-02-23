@@ -10,6 +10,7 @@ export interface RedditDataminerOptions {
 	path: string;
 	banner: string[];
 	hashes: string;
+	filterScript: string[];
 	sandbox: boolean;
 	cache: boolean;
 	mapIndex: number;
