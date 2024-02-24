@@ -1,10 +1,11 @@
-import { dumping as dumpingLog, hashes as hashesLog, log } from "./util/log";
+import { dumping as dumpingLog, log } from "./util/log";
 import puppeteer, { SetCookie } from "puppeteer";
 
+import { FileHashCache } from "./hash/file-hash-cache";
+import { NeverHashCache } from "./hash/never-hash-cache";
 import { RedditDataminerOptions } from "./util/options";
 import dumpScripts from "./util/dump-scripts";
 import fse from "fs-extra";
-import getHashes from "./util/get-hashes";
 import getRuntimeScripts from "./util/get-runtime-scripts";
 import getScripts from "./util/get-scripts";
 import getToken from "./util/get-token";
@@ -31,7 +32,8 @@ export default async function start(args: RedditDataminerOptions): Promise<strin
 	await fse.ensureDir(args.path);
 	log("ensured output path exists");
 
-	const hashes = await getHashes(args.hashes);
+	const hashes = args.hashes ? new FileHashCache(args.hashes) : new NeverHashCache();
+	await hashes.read();
 
 	const browser = await puppeteer.launch({
 		args: args.sandbox ? [] : noSandboxArgs,
@@ -83,16 +85,7 @@ export default async function start(args: RedditDataminerOptions): Promise<strin
 		dumpingLog("failed to dump all scripts");
 	}
 
-	if (args.hashes) {
-		await fse.writeJSON(args.hashes, hashes)
-			.then(written => {
-				hashesLog("saved new hashes to %s", args.hashes);
-				return written;
-			})
-			.catch(() => {
-				hashesLog("failed to save new hashes");
-			});
-	}
+	await hashes.write();
 
 	// Clean up
 	log("cleaning up");

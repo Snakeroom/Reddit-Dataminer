@@ -1,7 +1,8 @@
 import { Browser, SetCookie } from "puppeteer";
-import { hashes as hashesLog, log } from "./log";
 
+import { HashCache } from "../hash/hash-cache";
 import { filter } from "./filter";
+import { log } from "./log";
 import { userAgent } from "./user-agent";
 
 const baseURL = "https://new.reddit.com";
@@ -22,7 +23,7 @@ const noLoadResources = [
  * @param cache Whether the browser cache should be enabled.
  * @returns The script URLs.
  */
-export default async function getScripts(browser: Browser, hashes: Record<string, string>, sessionCookie: SetCookie, cache = false): Promise<string[]> {
+export default async function getScripts(browser: Browser, hashes: HashCache, sessionCookie: SetCookie, cache = false): Promise<string[]> {
 	const page = await browser.newPage();
 	await page.setUserAgent(userAgent);
 	await page.setJavaScriptEnabled(false);
@@ -62,8 +63,7 @@ export default async function getScripts(browser: Browser, hashes: Record<string
 		if (match === null) return false;
 
 		// Ignore script if it has the same hash as saved before
-		if (hashes[match[1]] === match[2]) {
-			hashesLog("skipping %s as its hash has not changed", match[1]);
+		if (hashes.isCached(match[1], match[2])) {
 			return false;
 		}
 

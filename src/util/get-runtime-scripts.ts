@@ -1,7 +1,7 @@
-import { hashes as hashesLog, log } from "./log";
-
+import { HashCache } from "../hash/hash-cache";
 import getHashObjects from "./get-hash-objects";
 import got from "got";
+import { log } from "./log";
 
 /**
  * Gets scripts from the runtime script.
@@ -10,7 +10,7 @@ import got from "got";
  * @param mapIndex The index of the object mapping file names to hashes in the runtime script.
  * @param mapBeforeJs Whether to filter runtime script objects by whether they are before a `".js"` string literal.
  */
-export default async function getRuntimeScripts(url: string, hashes: Record<string, string>, mapIndex = 1, mapBeforeJs = true): Promise<string[]> {
+export default async function getRuntimeScripts(url: string, hashes: HashCache, mapIndex = 1, mapBeforeJs = true): Promise<string[]> {
 	log("looking for scripts with runtime script");
 
 	// Fetch runtime script
@@ -26,11 +26,7 @@ export default async function getRuntimeScripts(url: string, hashes: Record<stri
 
 	// Convert object to script array
 	return scriptObjEntries.filter(([name, hash]) => {
-		if (hashes[name] === hash) {
-			hashesLog("skipping %s as its hash has not changed", name);
-			return false;
-		}
-		return true;
+		return !hashes.isCached(name, hash);
 	}).map(([name, hash]) => {
 		return "https://www.redditstatic.com/desktop2x/" + name + "." + hash + ".js";
 	});

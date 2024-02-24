@@ -1,3 +1,4 @@
+import { HashCache } from "../hash/hash-cache";
 import { RedditDataminerOptions } from "./options";
 import { ScriptInfo } from "../script-info";
 import { addModuleSuffix } from "./module-suffix";
@@ -21,7 +22,7 @@ import { uaGot } from "./got";
  * @param knownModules The modules that have already been archived.
  * @returns The number of modules archived.
  */
-async function dumpScript(script: ScriptInfo, transformersRun: Record<string, string>, args: RedditDataminerOptions, hashes: Record<string, string>, knownModules: Set<string>): Promise<number> {
+async function dumpScript(script: ScriptInfo, transformersRun: Record<string, string>, args: RedditDataminerOptions, hashes: HashCache, knownModules: Set<string>): Promise<number> {
 	const url = script.getUrl();
 	const index = script.getIndex();
 
@@ -91,7 +92,7 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 		moduleIndex += 1;
 	}
 
-	hashes[name] = hash;
+	hashes.add(name, hash);
 	return modules.size;
 }
 
@@ -103,7 +104,7 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
  * @param hashes The hashes for previously-saved scripts.
  * @returns Whether dumping was attempted for all scripts.
  */
-export default async function dumpScripts(scriptUrls: string[], transformersRun: Record<string, string>, args: RedditDataminerOptions, hashes: Record<string, string>): Promise<boolean> {
+export default async function dumpScripts(scriptUrls: string[], transformersRun: Record<string, string>, args: RedditDataminerOptions, hashes: HashCache): Promise<boolean> {
 	const scriptInfos = scriptUrls.map((url, index) => {
 		return new ScriptInfo(url, index);
 	}).filter(script => {
