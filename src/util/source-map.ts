@@ -1,6 +1,6 @@
-import { Identifier, Program } from "acorn";
-
+import { Program } from "acorn";
 import { SourceMapConsumer } from "source-map";
+import { isIdentifier } from "../node/identifier";
 import { dumping as log } from "./log";
 import { uaGot } from "./got";
 import { full as walkFull } from "acorn-walk";
@@ -37,7 +37,7 @@ export async function applySourceMap(program: Program, name: string, body: strin
 	const consumer = await new SourceMapConsumer(JSON.stringify(sourceMapBody));
 
 	walkFull(program, node => {
-		if (node.type !== "Identifier") return;
+		if (!isIdentifier(node)) return;
 
 		const pos = consumer.originalPositionFor({
 			column: node.loc.start.column,
@@ -46,7 +46,7 @@ export async function applySourceMap(program: Program, name: string, body: strin
 
 		if (pos.name === null) return;
 
-		(node as Identifier).name = pos.name;
+		node.name = pos.name;
 	});
 
 	return {

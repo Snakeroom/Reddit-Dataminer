@@ -36,9 +36,6 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 	const name = script.getName();
 	const hash = script.getHash();
 
-	/* eslint-disable-next-line no-eval -- CommonJS workaround */
-	const { toJs } = await eval("import(\"estree-util-to-js\")");
-
 	const transformersSourceMap = await applySourceMap(program, name, response.body);
 	const modules = splitModules(program, name, args);
 
@@ -63,7 +60,7 @@ async function dumpScript(script: ScriptInfo, transformersRun: Record<string, st
 			const path = resolve(args.path, "./" + addModuleSuffix(moduleName, args.keepModuleSuffix));
 
 			if (isPathInside(path, args.path)) {
-				const serialized = serializeModule(moduleNode, moduleName, toJs);
+				const serialized = await serializeModule(moduleNode, moduleName);
 
 				/**
 				 * The module-specific transformers.

@@ -1,6 +1,11 @@
 import { Program } from "acorn";
 import beautify from "js-beautify";
+import { isIdentifierNamed } from "../node/identifier";
+import { isStringLiteral } from "../node/literal";
 import { dumping as log } from "./log";
+import { simple as simpleWalk } from "acorn-walk";
+import { toJs } from "../node/to-js";
+import { transformCreateElement } from "../node/transform-create-element";
 
 function getJsonParseBody(program: Program): unknown | null {
 	const statement = program.body?.[0];
@@ -15,25 +20,21 @@ function getJsonParseBody(program: Program): unknown | null {
 	const callee = right.callee;
 	if (callee?.type !== "MemberExpression") return null;
 
-	if (callee.object.type !== "Identifier") return null;
-	if (callee.object.name !== "JSON") return null;
-
-	if (callee.property.type !== "Identifier") return null;
-	if (callee.property.name !== "parse") return null;
+	if (!isIdentifierNamed(callee.object, "JSON")) return null;
+	if (!isIdentifierNamed(callee.property, "parse")) return null;
 
 	if (right.arguments?.length !== 1) return null;
 
 	const argument = right.arguments[0];
 
-	if (argument.type !== "Literal") return null;
-	if (typeof argument.value !== "string") return null;
+	if (!isStringLiteral(argument)) return null;
 
 	return JSON.parse(argument.value);
 }
 
-type ToJs = (program: Program) => { value: string };
+export async function serializeModule(program: Program, name: string): Promise<string> {
+	const jsx = name.endsWith(".jsx") || name.endsWith(".tsx");
 
-export function serializeModule(program: Program, name: string, toJs: ToJs): string {
 	if (name.endsWith(".json")) {
 		const jsonBody = getJsonParseBody(program);
 
@@ -42,11 +43,22 @@ export function serializeModule(program: Program, name: string, toJs: ToJs): str
 		} else {
 			return JSON.stringify(jsonBody, null, "\t");
 		}
+	} else if (jsx) {
+		simpleWalk(program, {
+			CallExpression: node => {
+				const jsxNode = transformCreateElement(node);
+
+				if (jsxNode !== null) {
+					Object.assign(node, jsxNode);
+				}
+			},
+		});
 	}
 
-	const moduleBody = toJs(program).value;
+	const moduleBody = await toJs(program, jsx);
 
 	const beautified = beautify(moduleBody, {
+		e4x: jsx,
 		/* eslint-disable-next-line camelcase */
 		indent_with_tabs: true,
 	});

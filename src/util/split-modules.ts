@@ -1,6 +1,7 @@
 import { ObjectExpression, Program, Property, SpreadElement } from "acorn";
 
 import { RedditDataminerOptions } from "./options";
+import { isLiteral } from "../node/literal";
 import { dumping as log } from "./log";
 
 function getModuleObject(program: Program, args: RedditDataminerOptions): ObjectExpression | null {
@@ -27,7 +28,7 @@ function extractModule(property: SpreadElement | Property, program: Program, bun
 		return;
 	}
 
-	if (property.key.type !== "Literal") {
+	if (!isLiteral(property.key)) {
 		log("key of property %O in bundle '%s' is not a Literal node", property, bundleName);
 		return;
 	}
