@@ -6,6 +6,7 @@ import { dumping as log } from "./log";
 import { simple as simpleWalk } from "acorn-walk";
 import { toJs } from "../node/to-js";
 import { transformCreateElement } from "../node/transform-create-element";
+import { transformMinifiedBoolean } from "../node/transform-minified-boolean";
 
 function getJsonParseBody(program: Program): unknown | null {
 	const statement = program.body?.[0];
@@ -54,6 +55,16 @@ export async function serializeModule(program: Program, name: string): Promise<s
 			},
 		});
 	}
+
+	simpleWalk(program, {
+		UnaryExpression: node => {
+			const booleanNode = transformMinifiedBoolean(node);
+
+			if (booleanNode !== null) {
+				Object.assign(node, booleanNode);
+			}
+		},
+	});
 
 	const moduleBody = await toJs(program, jsx);
 
